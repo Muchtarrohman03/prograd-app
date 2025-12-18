@@ -1,16 +1,20 @@
-# laravel_flutter
+# Aplikasi Monitoring Karyawan
 
-A new Flutter project.
+Aplikasi mobile berbasis Flutter untuk monitoring aktivitas dan kehadiran karyawan.
 
-## Getting Started
+## 🚀 Tech Stack
+- Flutter
+- Dart
+- Laravel (Backend API)
+- REST API
 
-This project is a starting point for a Flutter application.
+## 📱 Fitur Utama
+- Login & Authentication
+- Monitoring kehadiran
+- Riwayat aktivitas karyawan
+- Logout
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Cara Menjalankan Project
+```bash
+flutter pub get
+flutter run
