@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 
 class GardenerPage extends StatefulWidget {
-  const GardenerPage({super.key, required this.child});
+  const GardenerPage({super.key, required this.navShell});
 
-  final Widget child;
+  final StatefulNavigationShell navShell;
 
   @override
   State<GardenerPage> createState() => _GardenerPageState();
@@ -14,27 +14,12 @@ class GardenerPage extends StatefulWidget {
 class _GardenerPageState extends State<GardenerPage> {
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-    int currentIndex = 0;
-    if (location.startsWith('/gardener/history')) currentIndex = 1;
-    if (location.startsWith('/gardener/profile')) currentIndex = 2;
-
     return Scaffold(
-      body: widget.child,
+      body: widget.navShell,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: widget.navShell.currentIndex,
         onTap: (i) {
-          switch (i) {
-            case 0:
-              context.go('/gardener');
-              break;
-            case 1:
-              context.go('/gardener/history');
-              break;
-            case 2:
-              context.go('/gardener/profile');
-              break;
-          }
+          widget.navShell.goBranch(i);
         },
         backgroundColor: Colors.green.shade50,
         selectedItemColor: Colors.green,

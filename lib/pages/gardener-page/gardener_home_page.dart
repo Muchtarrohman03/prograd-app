@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:heroicons/heroicons.dart';
@@ -27,10 +26,15 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
   }
 
   Future<void> loadUserInfo() async {
-    username = await storage.read(key: 'username') ?? '';
-    role = await storage.read(key: 'role') ?? '';
+    final u = await storage.read(key: 'username') ?? '';
+    final r = await storage.read(key: 'role') ?? '';
 
-    setState(() {});
+    if (!mounted) return; // ⬅️ INI WAJIB
+
+    setState(() {
+      username = u;
+      role = r;
+    });
   }
 
   @override

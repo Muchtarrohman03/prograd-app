@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'router/app_router.dart';
+import 'router/auth_state.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => AuthState()..load(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,18 +17,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'BeVietnamPro',
-        useMaterial3: true,
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          selectedLabelStyle: TextStyle(fontSize: 11),
-          unselectedLabelStyle: TextStyle(fontSize: 10),
-        ),
-      ),
+    return Builder(
+      builder: (context) {
+        final authState = context.watch<AuthState>();
 
-      routerConfig: appRouter,
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: appRouter(authState),
+          theme: ThemeData(fontFamily: 'BeVietnamPro', useMaterial3: true),
+        );
+      },
     );
   }
 }

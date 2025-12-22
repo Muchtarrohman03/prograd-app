@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 
 class StaffPage extends StatefulWidget {
-  const StaffPage({super.key, required this.child});
-  final Widget child;
+  const StaffPage({super.key, required this.navShell});
+  final StatefulNavigationShell navShell;
   @override
   State<StaffPage> createState() => _StaffPageState();
 }
@@ -13,27 +13,12 @@ class StaffPage extends StatefulWidget {
 class _StaffPageState extends State<StaffPage> {
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).uri.toString();
-    int currentIndex = 0;
-    if (location.startsWith('/staff/history')) currentIndex = 1;
-    if (location.startsWith('/staff/profile')) currentIndex = 2;
-
     return Scaffold(
-      body: widget.child,
+      body: widget.navShell,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
+        currentIndex: widget.navShell.currentIndex,
         onTap: (i) {
-          switch (i) {
-            case 0:
-              context.go('/staff');
-              break;
-            case 1:
-              context.go('/staff/history');
-              break;
-            case 2:
-              context.go('/staff/profile');
-              break;
-          }
+          widget.navShell.goBranch(i);
         },
         backgroundColor: Colors.green.shade50,
         selectedItemColor: Colors.green,

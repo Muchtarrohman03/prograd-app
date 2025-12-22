@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laravel_flutter/components/part/auth_bottom_sheet.dart';
+import 'package:laravel_flutter/components/part/login_section/auth_bottom_sheet.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

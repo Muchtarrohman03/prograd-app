@@ -1,11 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
-import 'package:heroicons/heroicons.dart';
+import 'package:laravel_flutter/components/part/profile_section/profile_actions_section.dart';
+import 'package:laravel_flutter/components/part/profile_section/profile_header.dart';
+import 'package:laravel_flutter/components/part/profile_section/profile_info_section.dart';
 import 'package:laravel_flutter/components/reusable/confirm_alert_dialog.dart';
+import 'package:laravel_flutter/pages/shared/profile_shimmer.dart';
+import 'package:laravel_flutter/router/auth_state.dart';
 import 'package:laravel_flutter/services/api_service.dart';
 import 'package:laravel_flutter/services/auth_service.dart';
-import 'package:laravel_flutter/components/reusable/info.dart'; // pastikan benar
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart'; // pastikan benar
 
 class UsersProfile extends StatefulWidget {
   const UsersProfile({super.key});
@@ -21,17 +27,59 @@ class _UsersProfileState extends State<UsersProfile> {
   final authService = AuthService();
 
   // 🔥 load data profile
-  late Future<Map<String, dynamic>> _profileFuture;
+  // late Future<Map<String, dynamic>> _profileFuture;
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+
+  final StreamController<Map<String, dynamic>> _profileController =
+      StreamController.broadcast();
+
+  bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
     super.initState();
-    _profileFuture = apiService.getMyProfile(); // ⬅ tanpa token
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+      });
+
+      final response = await apiService.getMyProfile();
+      _profileController.add(response);
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _isLoading = false;
+      });
+      _profileController.addError(e);
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    try {
+      await _fetchProfile();
+      await Future.delayed(const Duration(milliseconds: 300));
+      _refreshController.refreshCompleted();
+    } catch (_) {
+      _refreshController.refreshFailed();
+    }
   }
 
   Future<void> logout(BuildContext context) async {
     final token = await storage.read(key: 'token');
 
+    // 1️⃣ Hit API logout (opsional)
     if (token != null) {
       try {
         await apiService.logout(token);
@@ -40,183 +88,97 @@ class _UsersProfileState extends State<UsersProfile> {
       }
     }
 
-    await authService.clearLoginData();
+    // 2️⃣ Update AUTH STATE (INI YANG PENTING)
+    await context.read<AuthState>().logout();
+  }
 
-    // ⬇ GoRouter yang handle navigasi
-    context.go('/login');
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    _profileController.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green.shade50,
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: const Text("User Profile"),
-        centerTitle: true,
-      ),
+      body: SafeArea(
+        bottom: false,
+        child: StreamBuilder<Map<String, dynamic>>(
+          stream: _profileController.stream,
+          builder: (context, snapshot) {
+            // ======================
+            // LOADING
+            // ======================
+            if (_isLoading && !snapshot.hasData) {
+              return SmartRefresher(
+                controller: _refreshController,
+                enablePullDown: true,
+                onRefresh: _onRefresh,
+                child: const ProfileShimmer(),
+              );
+            }
 
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _profileFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (!snapshot.hasData || snapshot.hasError) {
-            return const Center(child: Text("Gagal memuat data profil"));
-          }
-
-          final data = snapshot.data!["data"];
-          final username = data["username"];
-          final email = data["email"];
-          final division = data["division"];
-          final roleList = data["role"]; // array
-          final role = (roleList is List && roleList.isNotEmpty)
-              ? roleList[0]
-              : "-";
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                // =======================
-                // HEADER PROFIL
-                // =======================
-                CircleAvatar(
-                  radius: 45,
-                  backgroundColor: Colors.green.shade300,
-                  child: const Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Colors.white,
+            // ======================
+            // ERROR
+            // ======================
+            if (_hasError || snapshot.hasError) {
+              return SmartRefresher(
+                controller: _refreshController,
+                enablePullDown: true,
+                onRefresh: _onRefresh,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.only(
+                    bottom: kBottomNavigationBarHeight + 24,
                   ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  username,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(email, style: const TextStyle(color: Colors.grey)),
-
-                const SizedBox(height: 20),
-
-                // =======================
-                // CARD INFO
-                // =======================
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildInfoItem("Role", role),
-                      _buildInfoItem("Division", division),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // =======================
-                // DATA PROFILE DETAIL
-                // =======================
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Info",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: [
-                      Info(
-                        infoKey: "Nama",
-                        info: username,
-                        icon: HeroIcons.user,
-                      ),
-                      Info(
-                        infoKey: "Email",
-                        info: email,
-                        icon: HeroIcons.envelope,
-                      ),
-                      Info(
-                        infoKey: "Role",
-                        info: role,
-                        icon: HeroIcons.identification,
-                      ),
-                      Info(
-                        infoKey: "Sektor",
-                        info: division,
-                        icon: HeroIcons.buildingOffice,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Aksi",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-                ElevatedButton(
-                  onPressed: null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 40,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.settings, color: Colors.grey.shade800),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Pengaturan",
-                        style: TextStyle(color: Colors.grey.shade800),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 15),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  children: const [
+                    SizedBox(height: 300),
+                    Center(
+                      child: Text(
+                        "Gagal memuat data profil",
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                    onPressed: () {
+                  ],
+                ),
+              );
+            }
+
+            // ======================
+            // SUCCESS
+            // ======================
+            final data = snapshot.data!["data"];
+            final username = data["username"];
+            final email = data["email"];
+            final division = data["division"];
+            final roleList = data["role"];
+            final role = (roleList is List && roleList.isNotEmpty)
+                ? roleList[0]
+                : "-";
+
+            return SmartRefresher(
+              controller: _refreshController,
+              enablePullDown: true,
+              onRefresh: _onRefresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: kBottomNavigationBarHeight + 24,
+                ),
+                children: [
+                  ProfileHeader(username: username, email: email),
+
+                  ProfileInfoSection(
+                    username: username,
+                    email: email,
+                    role: role,
+                    division: division,
+                  ),
+
+                  ProfileActionsSection(
+                    onLogout: () {
                       showCustomAlertDialog(
                         context: context,
                         title: 'Konfirmasi Logout',
@@ -226,35 +188,13 @@ class _UsersProfileState extends State<UsersProfile> {
                         confirmColor: Colors.red,
                       );
                     },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.logout, color: Colors.white),
-                        SizedBox(width: 8),
-                        Text("Logout", style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildInfoItem(String title, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ],
+              ),
+            );
+          },
         ),
-      ],
+      ),
     );
   }
 }

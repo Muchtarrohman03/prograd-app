@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:laravel_flutter/components/reusable/rounded_input_text.dart';
+import 'package:laravel_flutter/router/auth_state.dart';
 import 'package:laravel_flutter/services/api_service.dart';
 import 'package:laravel_flutter/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class AuthBottomSheet extends StatefulWidget {
   const AuthBottomSheet({super.key});
@@ -26,6 +27,7 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
     try {
       final api = ApiService();
       final auth = AuthService();
+      final authState = context.read<AuthState>(); // 🔥 AMBIL STATE
 
       final response = await api.login(
         emailController.text.trim(),
@@ -44,13 +46,15 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
         throw Exception("Data login tidak lengkap");
       }
 
-      // ✅ SIMPAN SAJA
+      // 1️⃣ SIMPAN DATA LOGIN
       await auth.saveLoginData(token, username, role);
 
-      // ✅ BIARKAN GOROUTER YANG REDIRECT
-      if (mounted) {
-        context.go('/');
-      }
+      // 2️⃣ UPDATE AUTH STATE (INI YANG PENTING)
+      await authState.login(role);
+
+      // ❌ TIDAK ADA context.go()
+      // ❌ TIDAK ADA Navigator.push()
+      // GoRouter akan redirect otomatis
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
