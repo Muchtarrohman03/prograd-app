@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class WeatherService {
   final Dio _dio = Dio(
@@ -9,7 +10,7 @@ class WeatherService {
     ),
   );
 
-  final String apiKey = '7bcdfe6a5a7c0f5994e9f35737b33b6e';
+  final String apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
 
   WeatherService() {
     _dio.interceptors.add(

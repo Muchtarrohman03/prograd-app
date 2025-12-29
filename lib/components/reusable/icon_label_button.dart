@@ -23,8 +23,8 @@ class IconLabelButton extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 80,
-          height: 80,
+          width: 50,
+          height: 50,
           child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
@@ -38,7 +38,7 @@ class IconLabelButton extends StatelessWidget {
             ),
             child: HeroIcon(
               icon,
-              size: 40,
+              size: 20,
               color: iconcolor,
               style: HeroIconStyle.solid,
             ),

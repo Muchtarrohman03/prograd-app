@@ -8,7 +8,7 @@ class ApiService {
     BaseOptions(
       //10.40.30.28
       //192.168.1.64
-      baseUrl: "http://10.40.30.28:80/api",
+      baseUrl: "http://10.170.77.28:80/api",
       connectTimeout: Duration(seconds: 10),
       receiveTimeout: Duration(seconds: 10),
     ),

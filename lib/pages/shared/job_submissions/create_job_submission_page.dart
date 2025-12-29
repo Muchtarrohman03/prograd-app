@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:laravel_flutter/components/reusable/shimmer_tile.dart';
 import 'package:laravel_flutter/helpers/job_category_helpers.dart';
 import 'package:laravel_flutter/models/job_category.dart';
 
@@ -61,7 +62,12 @@ class _CreateJobSubmissionPageState extends State<CreateJobSubmissionPage> {
         builder: (context, snapshot) {
           // loading
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return ListView.builder(
+              itemCount: 10,
+              itemBuilder: (context, index) {
+                return ShimmerTile();
+              },
+            );
           }
 
           // error
