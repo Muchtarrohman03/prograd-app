@@ -27,7 +27,7 @@ class LoginPage extends StatelessWidget {
                 "Buat laporan pekerjaan, sekarang jadi lebih mudah !",
                 style: TextStyle(fontSize: 16, color: Colors.green[700]),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 50),
 
               // Pastikan gambar tersedia di assets
               Center(

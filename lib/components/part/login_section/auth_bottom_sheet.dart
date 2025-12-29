@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:laravel_flutter/components/reusable/confirm_button.dart';
 import 'package:laravel_flutter/components/reusable/rounded_input_text.dart';
 import 'package:laravel_flutter/router/auth_state.dart';
 import 'package:laravel_flutter/services/api_service.dart';
@@ -132,28 +133,10 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
                   ),
                   const SizedBox(height: 8),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: isLoading ? null : doLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text(
-                              "Masuk",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
+                  ConfirmButton(
+                    isLoading: isLoading,
+                    action: doLogin,
+                    text: "Masuk",
                   ),
 
                   const SizedBox(height: 20),

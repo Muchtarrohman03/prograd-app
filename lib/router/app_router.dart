@@ -2,20 +2,26 @@ import 'package:go_router/go_router.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_history_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_home_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_page.dart';
-import 'package:laravel_flutter/pages/shared/job_submissions/job_submission_page.dart';
+import 'package:laravel_flutter/pages/gardener-page/gardener_profile_page.dart';
+import 'package:laravel_flutter/pages/shared/absences/create_absences.dart';
+import 'package:laravel_flutter/pages/shared/job_submissions/confirm_job_submission_page.dart';
+import 'package:laravel_flutter/pages/shared/job_submissions/create_job_submission_page.dart';
 import 'package:laravel_flutter/pages/shared/login_page.dart';
+import 'package:laravel_flutter/pages/shared/overtime/create_overtime.dart';
 import 'package:laravel_flutter/pages/shared/splash_page.dart';
-import 'package:laravel_flutter/pages/shared/users_profile.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_home_page.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_page.dart';
+import 'package:laravel_flutter/pages/site-manager-page/site_manager_profile_page.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_view_submissions.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_view_user.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_history_page.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_home_page.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_page.dart';
+import 'package:laravel_flutter/pages/staff-page/staff_profile_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_acc.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_home_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_page.dart';
+import 'package:laravel_flutter/pages/supervisor-page/supervisor_profile_page.dart';
 import 'package:laravel_flutter/router/auth_state.dart';
 
 GoRouter appRouter(AuthState authState) => GoRouter(
@@ -97,11 +103,35 @@ GoRouter appRouter(AuthState authState) => GoRouter(
           routes: [
             GoRoute(
               path: '/gardener/profile',
-              builder: (_, __) => const UsersProfile(),
+              builder: (_, __) => const GardenerProfilePage(),
             ),
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/gardener/job-submission',
+      builder: (context, state) => const CreateJobSubmissionPage(),
+      routes: [
+        GoRoute(
+          path: '/confirm-job-submission',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return ConfirmJobSubmissionPage(
+              category: extra['category'],
+              imageFile: extra['image'],
+            );
+          },
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/gardener/create-overtime',
+      builder: (context, state) => const CreateOvertime(),
+    ),
+    GoRoute(
+      path: '/gardener/create-absence',
+      builder: (context, state) => const CreateAbsences(),
     ),
 
     /// =======================
@@ -129,11 +159,35 @@ GoRouter appRouter(AuthState authState) => GoRouter(
           routes: [
             GoRoute(
               path: '/staff/profile',
-              builder: (_, __) => const UsersProfile(),
+              builder: (_, __) => const StaffProfilePage(),
             ),
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/staff/job-submission',
+      builder: (context, state) => const CreateJobSubmissionPage(),
+      routes: [
+        GoRoute(
+          path: '/confirm-job-submission',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return ConfirmJobSubmissionPage(
+              category: extra['category'],
+              imageFile: extra['image'],
+            );
+          },
+        ),
+      ],
+    ),
+    GoRoute(
+      path: '/staff/create-overtime',
+      builder: (context, state) => const CreateOvertime(),
+    ),
+    GoRoute(
+      path: '/staff/create-absence',
+      builder: (context, state) => const CreateAbsences(),
     ),
 
     /// =======================
@@ -165,7 +219,7 @@ GoRouter appRouter(AuthState authState) => GoRouter(
           routes: [
             GoRoute(
               path: '/supervisor/profile',
-              builder: (_, __) => const UsersProfile(),
+              builder: (_, __) => const SupervisorProfilePage(),
             ),
           ],
         ),
@@ -208,15 +262,11 @@ GoRouter appRouter(AuthState authState) => GoRouter(
           routes: [
             GoRoute(
               path: '/site-manager/profile',
-              builder: (_, __) => const UsersProfile(),
+              builder: (_, __) => const SiteManagerProfilePage(),
             ),
           ],
         ),
       ],
-    ),
-    GoRoute(
-      path: 'job-submission',
-      builder: (_, __) => const JobSubmissionPage(),
     ),
   ],
 );

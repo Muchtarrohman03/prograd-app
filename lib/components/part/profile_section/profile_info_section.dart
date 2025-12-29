@@ -7,13 +7,17 @@ class ProfileInfoSection extends StatelessWidget {
   final String email;
   final String role;
   final String division;
+  final String gender;
+  final bool isLoading;
 
   const ProfileInfoSection({
     super.key,
     required this.username,
     required this.email,
     required this.role,
+    required this.gender,
     required this.division,
+    this.isLoading = false,
   });
 
   @override
@@ -24,6 +28,7 @@ class ProfileInfoSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 25),
+
           const Text(
             "Info",
             style: TextStyle(
@@ -32,6 +37,7 @@ class ProfileInfoSection extends StatelessWidget {
               color: Colors.grey,
             ),
           ),
+
           const SizedBox(height: 15),
 
           Container(
@@ -41,17 +47,35 @@ class ProfileInfoSection extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Info(infoKey: "Nama", info: username, icon: HeroIcons.user),
-                Info(infoKey: "Email", info: email, icon: HeroIcons.envelope),
+                Info(
+                  infoKey: "Nama",
+                  info: username,
+                  icon: HeroIcons.user,
+                  isLoading: isLoading,
+                ),
+                Info(
+                  infoKey: "Email",
+                  info: email,
+                  icon: HeroIcons.envelope,
+                  isLoading: isLoading,
+                ),
                 Info(
                   infoKey: "Role",
                   info: role,
                   icon: HeroIcons.identification,
+                  isLoading: isLoading,
                 ),
                 Info(
                   infoKey: "Sektor",
                   info: division,
                   icon: HeroIcons.buildingOffice,
+                  isLoading: isLoading,
+                ),
+                Info(
+                  infoKey: "Jenis Kelamin",
+                  info: gender,
+                  icon: HeroIcons.user,
+                  isLoading: isLoading,
                 ),
               ],
             ),
