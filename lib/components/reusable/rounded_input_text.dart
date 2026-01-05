@@ -3,19 +3,23 @@ import 'package:flutter/material.dart';
 class RoundedInputText extends StatefulWidget {
   final String hintText;
   final TextEditingController controller;
-  final String labeldata;
+  final String? labeldata;
   final IconData icon;
   final FormFieldValidator<String>? validator;
   final bool isPassword; // ✅ opsional password
+  final IconData? sufficicon;
+  final VoidCallback? action;
 
   const RoundedInputText({
     super.key,
     required this.hintText,
     required this.controller,
-    required this.labeldata,
+    this.labeldata,
     required this.icon,
     this.validator,
     this.isPassword = false, // default bukan password
+    this.sufficicon,
+    this.action,
   });
 
   @override
@@ -51,7 +55,7 @@ class _RoundedInputTextState extends State<RoundedInputText> {
         },
         decoration: InputDecoration(
           prefixIcon: Icon(widget.icon, color: Colors.green, size: 20),
-          labelText: widget.labeldata,
+          labelText: widget.labeldata ?? null,
           labelStyle: const TextStyle(color: Colors.green),
           hintText: widget.hintText,
           hintStyle: const TextStyle(color: Colors.grey),
@@ -85,7 +89,10 @@ class _RoundedInputTextState extends State<RoundedInputText> {
                     });
                   },
                 )
-              : null,
+              : IconButton(
+                  onPressed: widget.action,
+                  icon: Icon(widget.sufficicon),
+                ),
         ),
       ),
     );

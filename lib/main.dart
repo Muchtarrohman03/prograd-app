@@ -5,7 +5,7 @@ import 'router/auth_state.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
-  await dotenv.load();
+  await dotenv.load(); //⬅️ error pada baris ini
   runApp(
     ChangeNotifierProvider(
       create: (_) => AuthState()..load(),
@@ -26,7 +26,15 @@ class MyApp extends StatelessWidget {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           routerConfig: appRouter(authState),
-          theme: ThemeData(fontFamily: 'BeVietnamPro', useMaterial3: true),
+          theme: ThemeData(
+            fontFamily: 'BeVietnamPro',
+            useMaterial3: true,
+            timePickerTheme: TimePickerThemeData(
+              dialHandColor: Colors.green,
+              entryModeIconColor: Colors.green,
+            ),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          ),
         );
       },
     );

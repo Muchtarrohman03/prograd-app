@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:laravel_flutter/helpers/transition_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_history_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_home_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_page.dart';
@@ -110,11 +111,12 @@ GoRouter appRouter(AuthState authState) => GoRouter(
       ],
     ),
     GoRoute(
-      path: '/gardener/job-submission',
-      builder: (context, state) => const CreateJobSubmissionPage(),
+      path: '/gardener/create-job-submission',
+      pageBuilder: (context, state) =>
+          slidePage(key: state.pageKey, child: const CreateJobSubmissionPage()),
       routes: [
         GoRoute(
-          path: '/confirm-job-submission',
+          path: 'confirm-job-submission',
           builder: (context, state) {
             final extra = state.extra as Map<String, dynamic>;
             return ConfirmJobSubmissionPage(
@@ -127,11 +129,14 @@ GoRouter appRouter(AuthState authState) => GoRouter(
     ),
     GoRoute(
       path: '/gardener/create-overtime',
-      builder: (context, state) => const CreateOvertime(),
+      pageBuilder: (context, state) =>
+          slidePage(key: state.pageKey, child: const CreateOvertime()),
     ),
+
     GoRoute(
       path: '/gardener/create-absence',
-      builder: (context, state) => const CreateAbsences(),
+      pageBuilder: (context, state) =>
+          slidePage(key: state.pageKey, child: CreateAbsences()),
     ),
 
     /// =======================

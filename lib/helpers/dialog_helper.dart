@@ -5,7 +5,7 @@ class DialogHelper {
   static Future<void> showAutoDismissSuccess(
     BuildContext context, {
     required String message,
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(milliseconds: 2500),
     VoidCallback? onFinish,
   }) async {
     showDialog(
@@ -30,7 +30,7 @@ class DialogHelper {
   static Future<void> showAutoDismissError(
     BuildContext context, {
     required String message,
-    Duration duration = const Duration(seconds: 5),
+    Duration duration = const Duration(milliseconds: 2500),
   }) async {
     showDialog(
       context: context,

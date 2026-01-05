@@ -21,7 +21,7 @@ class ConfirmButton extends StatelessWidget {
           backgroundColor: Colors.green,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(15),
           ),
         ),
         child: isLoading

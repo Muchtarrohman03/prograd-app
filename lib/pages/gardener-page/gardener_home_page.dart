@@ -166,7 +166,9 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
                                 label: "Pekerjaan\nBaru",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/gardener/job-submission');
+                                  context.push(
+                                    '/gardener/create-job-submission',
+                                  );
                                 },
                               ),
                               IconLabelButton(
