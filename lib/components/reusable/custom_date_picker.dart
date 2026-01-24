@@ -5,11 +5,13 @@ import 'package:heroicons/heroicons.dart';
 class CustomDatePicker extends StatefulWidget {
   final DateTime date;
   final ValueChanged<DateTime> onChanged;
+  final Color? colorTheme;
 
   const CustomDatePicker({
     super.key,
     required this.date,
     required this.onChanged,
+    this.colorTheme,
   });
 
   @override
@@ -174,7 +176,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
                     left: Radius.circular(15),
                   ),
                 ),
-                color: Colors.green.shade400,
+                color: widget.colorTheme ?? Colors.green.shade400,
                 onPressed: () {
                   setState(() => _enabled = true);
                   _showCalendar(context);
@@ -201,7 +203,7 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
               if (!_enabled)
                 IconButton(
                   icon: const HeroIcon(HeroIcons.pencil, size: 16),
-                  color: Colors.green,
+                  color: widget.colorTheme ?? Colors.green,
                   onPressed: _enableEdit,
                 ),
             ],

@@ -1,22 +1,25 @@
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:laravel_flutter/components/reusable/badged_icon.dart';
+import 'package:laravel_flutter/providers/job_submission_draft_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:laravel_flutter/components/reusable/shimmer_tile.dart';
 import 'package:laravel_flutter/helpers/job_category_helpers.dart';
 import 'package:laravel_flutter/models/job_category.dart';
 
-class CreateJobSubmissionPage extends StatefulWidget {
+class CreateJobSubmissionPage extends ConsumerStatefulWidget {
   const CreateJobSubmissionPage({super.key});
 
   @override
-  State<CreateJobSubmissionPage> createState() =>
+  ConsumerState<CreateJobSubmissionPage> createState() =>
       _CreateJobSubmissionPageState();
 }
 
-class _CreateJobSubmissionPageState extends State<CreateJobSubmissionPage> {
+class _CreateJobSubmissionPageState
+    extends ConsumerState<CreateJobSubmissionPage> {
   late Future<List<JobCategory>> _futureCategories;
+  bool _isCreatingDraft = false;
   bool isLoading = false;
   bool _isSearching = false; // 🔍 mode search aktif
   String _query = ''; // keyword pencarian
@@ -42,40 +45,26 @@ class _CreateJobSubmissionPageState extends State<CreateJobSubmissionPage> {
         .toList();
   }
 
-  Future<void> pickImageFromCamera(JobCategory category) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 80,
-    );
-
-    if (image != null) {
-      final file = File(image.path);
-
-      if (!mounted) return;
-
-      context.push(
-        '/gardener/create-job-submission/confirm-job-submission',
-        extra: {'category': category, 'image': file},
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final draftCount = ref.watch(draftListProvider).length;
     return Scaffold(
-      backgroundColor: Colors.green.shade50,
+      backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.blue.shade300,
+        centerTitle: true,
         title: _isSearching
             ? AnimatedOpacity(
                 opacity: 1,
                 duration: Duration(milliseconds: 1000),
                 child: TextField(
+                  style: TextStyle(color: Colors.white),
                   controller: _searchController,
                   autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Cari nama jobdesk',
+                    hintStyle: TextStyle(color: Colors.white),
                     border: InputBorder.none,
                   ),
                   onChanged: (value) {
@@ -85,26 +74,37 @@ class _CreateJobSubmissionPageState extends State<CreateJobSubmissionPage> {
                   },
                 ),
               )
-            : const Text('Buat Laporan Pekerjaan'),
+            : const Text(
+                'Buat Draft Pekerjaan',
+                style: TextStyle(color: Colors.white),
+              ),
+
         actions: [
-          if (_isSearching)
-            IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () {
-                setState(() {
-                  _isSearching = false;
-                  _query = '';
-                  _searchController.clear();
-                });
-                FocusScope.of(context).unfocus();
-              },
-            ),
+          _isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                      _query = '';
+                      _searchController.clear();
+                    });
+                    FocusScope.of(context).unfocus();
+                  },
+                )
+              : BadgedIcon(
+                  count: draftCount,
+                  onPressed: () {
+                    context.pushNamed('job-submission-draft');
+                  },
+                  icon: HeroIcons.clipboardDocumentList,
+                ),
         ],
       ),
 
       floatingActionButton: !_isSearching
           ? FloatingActionButton(
-              backgroundColor: Colors.green.shade300,
+              backgroundColor: Colors.blue.shade300,
               onPressed: () {
                 setState(() {
                   _isSearching = true;
@@ -169,17 +169,63 @@ class _CreateJobSubmissionPageState extends State<CreateJobSubmissionPage> {
                 color: Colors.grey.shade50,
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Colors.green[100],
+                    backgroundColor: Colors.blue[100],
                     child: HeroIcon(
-                      HeroIcons.documentText,
-                      color: Colors.green[800],
+                      HeroIcons.clipboardDocumentCheck,
+                      color: Colors.blue[800],
                     ),
                   ),
                   title: Text(category.name),
                   subtitle: Text(category.description),
-                  trailing: HeroIcon(HeroIcons.camera),
+                  trailing: const HeroIcon(HeroIcons.documentPlus),
+
                   onTap: () async {
-                    await pickImageFromCamera(category);
+                    if (_isCreatingDraft) return;
+
+                    setState(() => _isCreatingDraft = true);
+
+                    try {
+                      // 🔥 SATU-SATUNYA CARA BUAT DRAFT
+                      await ref
+                          .read(draftListProvider.notifier)
+                          .createDraft(category);
+
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          content: Text(
+                            'Draft "${category.name}" berhasil dibuat',
+                          ),
+                          backgroundColor: Colors.green.shade600,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'Gagal membuat draft job submission',
+                          ),
+                          backgroundColor: Colors.red.shade600,
+                        ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() => _isCreatingDraft = false);
+                      }
+                    }
+
                     setState(() {
                       _isSearching = false;
                       _query = '';

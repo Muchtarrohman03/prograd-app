@@ -9,8 +9,10 @@ import 'package:laravel_flutter/components/reusable/custom_textfield.dart';
 import 'package:laravel_flutter/components/reusable/custom_time_picker.dart';
 import 'package:laravel_flutter/components/reusable/jobcategory_auto_complete_field.dart';
 import 'package:laravel_flutter/helpers/dialog_helper.dart';
+import 'package:laravel_flutter/helpers/job_category_helpers.dart';
 import 'package:laravel_flutter/models/job_category.dart';
 import 'package:laravel_flutter/services/api_service.dart';
+import 'package:searchfield/searchfield.dart';
 
 class CreateOvertime extends StatefulWidget {
   const CreateOvertime({super.key});
@@ -21,10 +23,16 @@ class CreateOvertime extends StatefulWidget {
 
 class _CreateOvertimeState extends State<CreateOvertime> {
   File? _imageFile;
+
   bool isCaptured = true;
   bool isLoading = false;
+
   JobCategory? selectedCategory;
-  final TextEditingController _jobCategoryController = TextEditingController();
+  List<SearchFieldListItem<JobCategory>> jobCategorySuggestions = [];
+
+  final _JobCategoryController = TextEditingController();
+  final _helper = JobCategoryHelper();
+
   final TextEditingController _descriptionController = TextEditingController();
   TimeOfDay _timeStart = TimeOfDay.now();
   TimeOfDay _timeEnd = TimeOfDay(hour: 0, minute: 0);
@@ -32,6 +40,21 @@ class _CreateOvertimeState extends State<CreateOvertime> {
     final startMinutes = start.hour * 60 + start.minute;
     final endMinutes = end.hour * 60 + end.minute;
     return endMinutes > startMinutes;
+  }
+
+  Future<void> _fetchJobCategories() async {
+    try {
+      final categories = await _helper.fetchJobCategories();
+
+      setState(() {
+        jobCategorySuggestions = categories
+            .map((e) => SearchFieldListItem<JobCategory>(e.name, item: e))
+            .toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> pickImageFromCamera() async {
@@ -102,15 +125,21 @@ class _CreateOvertimeState extends State<CreateOvertime> {
   }
 
   @override
-  void dispose() {
-    _jobCategoryController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _fetchJobCategories();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Buat Lembur")),
+      backgroundColor: Colors.green.shade50,
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        title: Text("Buat Lembur", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.green,
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16),
@@ -129,13 +158,14 @@ class _CreateOvertimeState extends State<CreateOvertime> {
                 ),
                 SizedBox(height: 15),
                 JobCategoryAutocompleteField(
-                  controller: _jobCategoryController, // 👈 kirim controller
+                  controller: _JobCategoryController,
                   onSelected: (category) {
                     setState(() {
                       selectedCategory = category;
-                      _jobCategoryController.text = category?.name ?? '';
                     });
                   },
+                  suggestions: jobCategorySuggestions,
+                  isLoading: isLoading,
                 ),
                 SizedBox(height: 15),
                 Text(

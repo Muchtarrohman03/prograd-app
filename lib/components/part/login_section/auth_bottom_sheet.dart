@@ -28,7 +28,7 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
     try {
       final api = ApiService();
       final auth = AuthService();
-      final authState = context.read<AuthState>(); // 🔥 AMBIL STATE
+      final authState = context.read<AuthState>(); //AMBIL STATE
 
       final response = await api.login(
         emailController.text.trim(),
@@ -47,14 +47,12 @@ class _AuthBottomSheetState extends State<AuthBottomSheet> {
         throw Exception("Data login tidak lengkap");
       }
 
-      // 1️⃣ SIMPAN DATA LOGIN
+      //SIMPAN DATA LOGIN
       await auth.saveLoginData(token, username, role);
 
-      // 2️⃣ UPDATE AUTH STATE (INI YANG PENTING)
+      //UPDATE AUTH STATE (INI YANG PENTING)
       await authState.login(role);
 
-      // ❌ TIDAK ADA context.go()
-      // ❌ TIDAK ADA Navigator.push()
       // GoRouter akan redirect otomatis
     } catch (e) {
       if (mounted) {

@@ -6,10 +6,12 @@ class ConfirmButton extends StatelessWidget {
     required this.isLoading,
     required this.action,
     required this.text,
+    this.buttonColor,
   });
   final bool isLoading;
   final VoidCallback action;
   final String text;
+  final Color? buttonColor;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class ConfirmButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : action,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green,
+          backgroundColor: buttonColor ?? Colors.green,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),

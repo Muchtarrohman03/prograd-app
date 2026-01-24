@@ -4,8 +4,15 @@ import 'package:dotted_border/dotted_border.dart';
 
 class CustomImagePicker extends StatelessWidget {
   final VoidCallback captureAction;
+  final double? height;
+  final double? iconWidth;
 
-  const CustomImagePicker({super.key, required this.captureAction});
+  const CustomImagePicker({
+    super.key,
+    required this.captureAction,
+    this.height,
+    this.iconWidth,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,19 +28,22 @@ class CustomImagePicker extends StatelessWidget {
         ),
         child: Container(
           width: double.infinity,
-          height: 200,
+          height: height ?? 200,
           decoration: BoxDecoration(
             color: Colors.grey.shade100,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              HeroIcon(HeroIcons.camera, color: Colors.grey, size: 40),
-              SizedBox(height: 5),
+            children: [
+              HeroIcon(HeroIcons.camera, color: Colors.grey, size: iconWidth),
+              const SizedBox(height: 5),
               Text(
                 'Ambil Gambar',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: (iconWidth ?? 20) / 2,
+                ),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'router/app_router.dart';
 import 'router/auth_state.dart';
@@ -9,7 +10,7 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => AuthState()..load(),
-      child: const MyApp(),
+      child: ProviderScope(child: MyApp()),
     ),
   );
 }

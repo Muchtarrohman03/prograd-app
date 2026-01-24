@@ -163,7 +163,7 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
                                 icon: HeroIcons.clipboardDocumentCheck,
                                 containercolor: Colors.blue.shade100,
                                 iconcolor: Colors.blue.shade300,
-                                label: "Pekerjaan\nBaru",
+                                label: "Laporan\nKerja",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
                                   context.push(

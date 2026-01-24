@@ -5,8 +5,8 @@ import 'package:laravel_flutter/pages/gardener-page/gardener_home_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_page.dart';
 import 'package:laravel_flutter/pages/gardener-page/gardener_profile_page.dart';
 import 'package:laravel_flutter/pages/shared/absences/create_absences.dart';
-import 'package:laravel_flutter/pages/shared/job_submissions/confirm_job_submission_page.dart';
 import 'package:laravel_flutter/pages/shared/job_submissions/create_job_submission_page.dart';
+import 'package:laravel_flutter/pages/shared/job_submissions/job_submission_draft_page.dart';
 import 'package:laravel_flutter/pages/shared/login_page.dart';
 import 'package:laravel_flutter/pages/shared/overtime/create_overtime.dart';
 import 'package:laravel_flutter/pages/shared/splash_page.dart';
@@ -116,14 +116,12 @@ GoRouter appRouter(AuthState authState) => GoRouter(
           slidePage(key: state.pageKey, child: const CreateJobSubmissionPage()),
       routes: [
         GoRoute(
-          path: 'confirm-job-submission',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return ConfirmJobSubmissionPage(
-              category: extra['category'],
-              imageFile: extra['image'],
-            );
-          },
+          path: 'job-submission-draft',
+          name: 'job-submission-draft',
+          pageBuilder: (context, state) => slidePage(
+            key: state.pageKey,
+            child: const JobSubmissionDraftPage(),
+          ),
         ),
       ],
     ),
@@ -173,18 +171,7 @@ GoRouter appRouter(AuthState authState) => GoRouter(
     GoRoute(
       path: '/staff/job-submission',
       builder: (context, state) => const CreateJobSubmissionPage(),
-      routes: [
-        GoRoute(
-          path: '/confirm-job-submission',
-          builder: (context, state) {
-            final extra = state.extra as Map<String, dynamic>;
-            return ConfirmJobSubmissionPage(
-              category: extra['category'],
-              imageFile: extra['image'],
-            );
-          },
-        ),
-      ],
+      routes: [],
     ),
     GoRoute(
       path: '/staff/create-overtime',

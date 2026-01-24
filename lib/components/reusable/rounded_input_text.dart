@@ -55,7 +55,7 @@ class _RoundedInputTextState extends State<RoundedInputText> {
         },
         decoration: InputDecoration(
           prefixIcon: Icon(widget.icon, color: Colors.green, size: 20),
-          labelText: widget.labeldata ?? null,
+          labelText: widget.labeldata,
           labelStyle: const TextStyle(color: Colors.green),
           hintText: widget.hintText,
           hintStyle: const TextStyle(color: Colors.grey),
