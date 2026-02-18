@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:heroicons/heroicons.dart';
+import 'package:laravel_flutter/components/part/absence/absences_history.dart';
+import 'package:laravel_flutter/components/part/job_submission/job_submission_history.dart';
+import 'package:laravel_flutter/components/part/overtime/overtime_history.dart';
 
 class GardenerHistoryPage extends StatefulWidget {
   const GardenerHistoryPage({super.key});
@@ -8,73 +10,84 @@ class GardenerHistoryPage extends StatefulWidget {
   State<GardenerHistoryPage> createState() => _GardenerHistoryPageState();
 }
 
-class _GardenerHistoryPageState extends State<GardenerHistoryPage> {
+class _GardenerHistoryPageState extends State<GardenerHistoryPage>
+    with TickerProviderStateMixin {
+  late final TabController _tabController;
+
+  final List<Tab> _tabs = const [
+    Tab(text: 'Kerja'),
+    Tab(text: 'Lembur'),
+    Tab(text: 'Izin'),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(
+      length: _tabs.length,
+      vsync: this,
+      animationDuration: const Duration(milliseconds: 300),
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.green,
-          title: const Text(
-            "Halaman Riwayat",
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          bottom: TabBar(
-            labelColor: Colors.white,
-            tabs: [
-              Tab(
-                icon: HeroIcon(
-                  HeroIcons.clipboardDocumentCheck,
-                  color: Colors.white,
-                ),
-                child: Text(
-                  'kerja',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w100),
-                ),
-              ),
-              Tab(
-                icon: HeroIcon(HeroIcons.clock, color: Colors.white),
-                child: Text(
-                  'lembur',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w100),
-                ),
-              ),
-              Tab(
-                icon: HeroIcon(HeroIcons.calendar, color: Colors.white),
-                child: Text(
-                  'izin',
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w100),
-                ),
-              ),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: Colors.green.shade50,
+
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Halaman Riwayat',
+          style: TextStyle(color: Colors.white),
         ),
-        body: TabBarView(
-          children: [
-            Container(
+      ),
+
+      body: Column(
+        children: [
+          /// TABBAR DI LUAR APPBAR
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
               color: Colors.green.shade100,
-              child: HeroIcon(
-                HeroIcons.clipboardDocumentCheck,
-                color: Colors.white,
-                size: 40,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              dividerColor: Colors.transparent,
+              tabs: _tabs,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.green.shade900,
+              labelStyle: const TextStyle(fontSize: 16),
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(15),
               ),
             ),
-            Container(
-              color: Colors.green.shade200,
-              child: HeroIcon(HeroIcons.clock, color: Colors.white, size: 40),
+          ),
+
+          /// TAB CONTENT (SCROLLABLE)
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: const [
+                JobSubmissionHistory(),
+                OvertimeHistory(),
+                AbsenceHistory(),
+              ],
             ),
-            Container(
-              color: Colors.green.shade300,
-              child: HeroIcon(
-                HeroIcons.calendarDateRange,
-                color: Colors.white,
-                size: 40,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

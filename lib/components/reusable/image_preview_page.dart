@@ -1,21 +1,24 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 class ImagePreviewPage extends StatelessWidget {
-  final File file;
+  final File? file;
+  final String? imageUrl;
   final String heroTag;
 
   const ImagePreviewPage({
     super.key,
-    required this.file,
+    this.file,
+    this.imageUrl,
     required this.heroTag,
   });
+
+  bool get _isNetwork => imageUrl != null;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: Stack(
           children: [
@@ -27,10 +30,9 @@ class ImagePreviewPage extends StatelessWidget {
                   minScale: 1,
                   maxScale: 5,
                   panEnabled: true,
-                  child: Image.file(
-                    file,
-                    fit: BoxFit.contain, // FULL IMAGE, NO CROP
-                  ),
+                  child: _isNetwork
+                      ? Image.network(imageUrl!, fit: BoxFit.contain)
+                      : Image.file(file!, fit: BoxFit.contain),
                 ),
               ),
             ),
@@ -39,13 +41,9 @@ class ImagePreviewPage extends StatelessWidget {
             Positioned(
               top: 10,
               right: 10,
-              child: Material(
-                color: Colors.transparent,
-                shape: const CircleBorder(),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
               ),
             ),
           ],

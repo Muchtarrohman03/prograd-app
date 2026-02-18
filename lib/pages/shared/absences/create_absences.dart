@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:laravel_flutter/components/reusable/app_snackbar.dart';
 import 'package:laravel_flutter/components/reusable/confirm_button.dart';
 import 'package:laravel_flutter/components/reusable/custom_date_picker.dart';
 import 'package:laravel_flutter/components/reusable/custom_dropdown.dart';
@@ -43,20 +44,36 @@ class _CreateAbsencesState extends State<CreateAbsences> {
   }
 
   Future<void> _submitAbsence() async {
-    setState(() {
-      isLoading = true;
-    });
-
     if (selectedReason == null) {
-      _showError('Jelaskan Alasan Izin Anda');
+      AppSnackBar.show(
+        context,
+        message: 'Pilih alasan absensi terlebih dahulu',
+        backgroundColor: Colors.yellow.shade700,
+      );
       return;
     }
 
     if (_imageFile == null) {
-      _showError('Lampirkan Foto Bukti');
+      AppSnackBar.show(
+        context,
+        message: 'Tambahkan gambar bukti terlebih dahulu',
+        backgroundColor: Colors.yellow.shade700,
+      );
       return;
     }
 
+    if (descriptionController.text.isEmpty) {
+      AppSnackBar.show(
+        context,
+        message: 'Jelaskan alasan izin terlebih dahulu',
+        backgroundColor: Colors.yellow.shade700,
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
     try {
       await ApiService().postAbsence(
         start,
@@ -73,31 +90,25 @@ class _CreateAbsencesState extends State<CreateAbsences> {
       );
       context.pop();
     } catch (e) {
-      _showError(e.toString());
-      await DialogHelper.showAutoDismissError(
+      AppSnackBar.show(
         context,
-        message: 'Terjadi kesalahan',
+        message: 'Terjadi Kesalahan: $e',
+        backgroundColor: Colors.red.shade400,
       );
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.orange.shade50,
+      backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         centerTitle: true,
         iconTheme: IconThemeData(color: Colors.white),
         title: Text("Buat Izin", style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.orange.shade300,
+        backgroundColor: Colors.green.shade300,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -115,7 +126,7 @@ class _CreateAbsencesState extends State<CreateAbsences> {
             _splitter(),
             CustomDropdown(
               value: selectedReason,
-              borderColor: Colors.orange.shade300,
+              borderColor: Colors.green.shade300,
               hint: 'Pilih alasan absen',
               items: const ['sakit', 'darurat', 'lainnya'],
               onChanged: (value) {
@@ -135,7 +146,7 @@ class _CreateAbsencesState extends State<CreateAbsences> {
             ),
             _splitter(),
             CustomDatePicker(
-              colorTheme: Colors.orange.shade300,
+              colorTheme: Colors.green.shade300,
               date: start,
               onChanged: (value) {
                 setState(() {
@@ -154,7 +165,7 @@ class _CreateAbsencesState extends State<CreateAbsences> {
             ),
             _splitter(),
             CustomDatePicker(
-              colorTheme: Colors.orange.shade300,
+              colorTheme: Colors.green.shade300,
               date: start,
               onChanged: (value) {
                 setState(() {
@@ -183,7 +194,11 @@ class _CreateAbsencesState extends State<CreateAbsences> {
                         fit: BoxFit.cover,
                       ),
                     )
-                  : CustomImagePicker(captureAction: pickImageFromCamera),
+                  : CustomImagePicker(
+                      captureAction: pickImageFromCamera,
+                      iconWidth: 30,
+                      height: 200,
+                    ),
             ),
             _spacer(),
             Text(
@@ -198,13 +213,14 @@ class _CreateAbsencesState extends State<CreateAbsences> {
             CustomTextfield(
               controller: descriptionController,
               hintText: 'Jelaskan Alasannya',
+              borderColor: Colors.green.shade300,
             ),
             _spacer(),
             ConfirmButton(
-              buttonColor: Colors.orange.shade300,
+              buttonColor: Colors.green.shade300,
               isLoading: isLoading,
               action: _submitAbsence,
-              text: "Buat Izin",
+              text: "Ajukan Izin",
             ),
           ],
         ),

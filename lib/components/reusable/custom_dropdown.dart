@@ -26,6 +26,7 @@ class CustomDropdown extends StatelessWidget {
       ),
       child: DropdownButton<String>(
         value: value,
+        borderRadius: BorderRadius.circular(15),
         isExpanded: true,
         underline: const SizedBox(),
         hint: Text(hint),

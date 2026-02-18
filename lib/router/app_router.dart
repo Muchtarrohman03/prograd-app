@@ -8,7 +8,8 @@ import 'package:laravel_flutter/pages/shared/absences/create_absences.dart';
 import 'package:laravel_flutter/pages/shared/job_submissions/create_job_submission_page.dart';
 import 'package:laravel_flutter/pages/shared/job_submissions/job_submission_draft_page.dart';
 import 'package:laravel_flutter/pages/shared/login_page.dart';
-import 'package:laravel_flutter/pages/shared/overtime/create_overtime.dart';
+import 'package:laravel_flutter/pages/shared/overtime/create_overtime_page.dart';
+import 'package:laravel_flutter/pages/shared/overtime/overtime_draft_page.dart';
 import 'package:laravel_flutter/pages/shared/splash_page.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_home_page.dart';
 import 'package:laravel_flutter/pages/site-manager-page/site_manager_page.dart';
@@ -19,8 +20,12 @@ import 'package:laravel_flutter/pages/staff-page/staff_history_page.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_home_page.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_page.dart';
 import 'package:laravel_flutter/pages/staff-page/staff_profile_page.dart';
+import 'package:laravel_flutter/pages/supervisor-page/supervisor_absence_approval_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_acc.dart';
+import 'package:laravel_flutter/pages/supervisor-page/supervisor_history_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_home_page.dart';
+import 'package:laravel_flutter/pages/supervisor-page/supervisor_job_submission_approval_page.dart';
+import 'package:laravel_flutter/pages/supervisor-page/supervisor_overtime_approval_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_page.dart';
 import 'package:laravel_flutter/pages/supervisor-page/supervisor_profile_page.dart';
 import 'package:laravel_flutter/router/auth_state.dart';
@@ -111,7 +116,7 @@ GoRouter appRouter(AuthState authState) => GoRouter(
       ],
     ),
     GoRoute(
-      path: '/gardener/create-job-submission',
+      path: '/create-job-submission',
       pageBuilder: (context, state) =>
           slidePage(key: state.pageKey, child: const CreateJobSubmissionPage()),
       routes: [
@@ -126,13 +131,21 @@ GoRouter appRouter(AuthState authState) => GoRouter(
       ],
     ),
     GoRoute(
-      path: '/gardener/create-overtime',
+      path: '/create-overtime',
       pageBuilder: (context, state) =>
-          slidePage(key: state.pageKey, child: const CreateOvertime()),
+          slidePage(key: state.pageKey, child: const CreateOvertimePage()),
+      routes: [
+        GoRoute(
+          path: 'overtime-draft',
+          name: 'overtime-draft',
+          pageBuilder: (context, state) =>
+              slidePage(key: state.pageKey, child: const OvertimeDraftPage()),
+        ),
+      ],
     ),
 
     GoRoute(
-      path: '/gardener/create-absence',
+      path: '/create-absence',
       pageBuilder: (context, state) =>
           slidePage(key: state.pageKey, child: CreateAbsences()),
     ),
@@ -168,19 +181,6 @@ GoRouter appRouter(AuthState authState) => GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: '/staff/job-submission',
-      builder: (context, state) => const CreateJobSubmissionPage(),
-      routes: [],
-    ),
-    GoRoute(
-      path: '/staff/create-overtime',
-      builder: (context, state) => const CreateOvertime(),
-    ),
-    GoRoute(
-      path: '/staff/create-absence',
-      builder: (context, state) => const CreateAbsences(),
-    ),
 
     /// =======================
     /// SUPERVISOR STATEFUL SHELL
@@ -210,12 +210,42 @@ GoRouter appRouter(AuthState authState) => GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
+              path: '/supervisor/history',
+              builder: (_, __) => const SupervisorHistoryPage(),
+            ),
+          ],
+        ),
+
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
               path: '/supervisor/profile',
               builder: (_, __) => const SupervisorProfilePage(),
             ),
           ],
         ),
       ],
+    ),
+    GoRoute(
+      path: '/supervisor/approval-job-submissions',
+      pageBuilder: (_, __) => slidePage(
+        key: __.pageKey,
+        child: const SupervisorJobSubmissionApprovalPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/supervisor/approval-overtime',
+      pageBuilder: (_, __) => slidePage(
+        key: __.pageKey,
+        child: const SupervisorOvertimeApprovalPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/supervisor/approval-absence',
+      pageBuilder: (_, __) => slidePage(
+        key: __.pageKey,
+        child: const SupervisorAbsenceApprovalPage(),
+      ),
     ),
 
     /// =======================

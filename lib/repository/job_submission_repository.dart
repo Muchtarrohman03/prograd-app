@@ -1,4 +1,4 @@
-import 'package:laravel_flutter/helpers/local_database.dart';
+import 'package:laravel_flutter/sqlite/local_database.dart';
 import 'package:laravel_flutter/models/job_category.dart';
 import 'package:laravel_flutter/models/job_submission_draft.dart';
 import 'package:sqflite/sqflite.dart';
@@ -67,5 +67,10 @@ class JobSubmissionDraftRepository {
   Future<void> deleteDraft(String id) async {
     final db = await LocalDatabase.database;
     await db.delete('job_submission_drafts', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> clearAllDrafts() async {
+    final db = await LocalDatabase.database;
+    await db.delete('job_submission_drafts');
   }
 }

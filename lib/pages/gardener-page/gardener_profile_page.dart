@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:laravel_flutter/components/part/profile_section/profile_header.dart';
@@ -8,21 +9,26 @@ import 'package:laravel_flutter/components/reusable/action_list_tile.dart';
 import 'package:laravel_flutter/components/reusable/confirm_alert_dialog.dart';
 import 'package:laravel_flutter/components/reusable/info.dart';
 import 'package:laravel_flutter/components/reusable/single_section.dart';
+import 'package:laravel_flutter/components/reusable/stat_overview_bottom_sheet.dart';
 import 'package:laravel_flutter/helpers/profile_avatar_resolver.dart';
+import 'package:laravel_flutter/models/stat_overview.dart';
+import 'package:laravel_flutter/providers/job_submission_draft_provider.dart';
+import 'package:laravel_flutter/providers/overtime_draft_provider.dart';
 import 'package:laravel_flutter/router/auth_state.dart';
 import 'package:laravel_flutter/services/api_service.dart';
 import 'package:laravel_flutter/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart'; // pastikan benar
 
-class GardenerProfilePage extends StatefulWidget {
+class GardenerProfilePage extends ConsumerStatefulWidget {
   const GardenerProfilePage({super.key});
 
   @override
-  State<GardenerProfilePage> createState() => _GardenerProfilePageState();
+  ConsumerState<GardenerProfilePage> createState() =>
+      _JobSubmissionDraftPageState();
 }
 
-class _GardenerProfilePageState extends State<GardenerProfilePage> {
+class _JobSubmissionDraftPageState extends ConsumerState<GardenerProfilePage> {
   final storage = FlutterSecureStorage();
   final apiService = ApiService();
   final authService = AuthService();
@@ -35,6 +41,9 @@ class _GardenerProfilePageState extends State<GardenerProfilePage> {
   final StreamController<Map<String, dynamic>> _profileController =
       StreamController.broadcast();
 
+  StatOverview? _statOverview;
+  bool _isStatLoading = true;
+
   bool _isLoading = true;
   bool _hasError = false;
 
@@ -42,6 +51,27 @@ class _GardenerProfilePageState extends State<GardenerProfilePage> {
   void initState() {
     super.initState();
     _fetchProfile();
+    _fetchStatOverview();
+  }
+
+  Future<void> _fetchStatOverview() async {
+    try {
+      setState(() {
+        _isStatLoading = true;
+      });
+
+      final stat = await apiService.getStatOverview();
+
+      setState(() {
+        _statOverview = stat;
+        _isStatLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Fetch stat overview error: $e');
+      setState(() {
+        _isStatLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchProfile() async {
@@ -68,7 +98,8 @@ class _GardenerProfilePageState extends State<GardenerProfilePage> {
 
   Future<void> _onRefresh() async {
     try {
-      await _fetchProfile();
+      await Future.wait([_fetchProfile(), _fetchStatOverview()]);
+
       await Future.delayed(const Duration(milliseconds: 300));
       _refreshController.refreshCompleted();
     } catch (_) {
@@ -87,8 +118,9 @@ class _GardenerProfilePageState extends State<GardenerProfilePage> {
         debugPrint("Logout API error: $e");
       }
     }
-
-    // 2️⃣ Update AUTH STATE (INI YANG PENTING)
+    // 2️⃣ Hapus data lokal
+    await ref.read(draftListProvider.notifier).clearDrafts();
+    await ref.read(overtimeDraftListProvider.notifier).clearDrafts();
     await context.read<AuthState>().logout();
   }
 
@@ -150,8 +182,48 @@ class _GardenerProfilePageState extends State<GardenerProfilePage> {
                     username: username,
                     email: email,
                     imagePath: avatarPath,
-                    isLoading: isLoading,
+                    isLoading: isLoading || _isStatLoading,
+                    jobSubmissionCount:
+                        _statOverview?.jobSubmissions.total ?? 0,
+                    absenceCount: _statOverview?.absences.total ?? 0,
+                    overtimeCount: _statOverview?.overtime.total ?? 0,
+                    onJobSubmissionTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => StatOverviewBottomSheet(
+                          icon: HeroIcon(HeroIcons.clipboardDocumentCheck),
+                          title: 'Laporan Kerja',
+                          stat: _statOverview!.jobSubmissions,
+                        ),
+                      );
+                    },
+
+                    onAbsenceTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (_) => StatOverviewBottomSheet(
+                          icon: HeroIcon(HeroIcons.calendarDays),
+                          title: 'Laporan Izin',
+                          stat: _statOverview!.absences,
+                        ),
+                      );
+                    },
+
+                    onOvertimeTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => StatOverviewBottomSheet(
+                          icon: HeroIcon(HeroIcons.clock),
+                          title: 'Pengajuan Lembur',
+                          stat: _statOverview!.overtime,
+                        ),
+                      );
+                    },
                   ),
+
                   // INFO SECTION
                   const SizedBox(height: 16),
                   Padding(

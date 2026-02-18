@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:laravel_flutter/components/reusable/badged_icon.dart';
-import 'package:laravel_flutter/providers/job_submission_draft_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:laravel_flutter/components/reusable/badged_icon.dart';
 import 'package:laravel_flutter/components/reusable/shimmer_tile.dart';
 import 'package:laravel_flutter/helpers/job_category_helpers.dart';
 import 'package:laravel_flutter/models/job_category.dart';
+// import 'package:laravel_flutter/providers/job_submission_draft_provider.dart';
+import 'package:laravel_flutter/providers/overtime_draft_provider.dart';
 
-class CreateJobSubmissionPage extends ConsumerStatefulWidget {
-  const CreateJobSubmissionPage({super.key});
+class CreateOvertimePage extends ConsumerStatefulWidget {
+  const CreateOvertimePage({super.key});
 
   @override
-  ConsumerState<CreateJobSubmissionPage> createState() =>
-      _CreateJobSubmissionPageState();
+  ConsumerState<CreateOvertimePage> createState() => _CreateOvertimePageState();
 }
 
-class _CreateJobSubmissionPageState
-    extends ConsumerState<CreateJobSubmissionPage> {
+class _CreateOvertimePageState extends ConsumerState<CreateOvertimePage> {
   late Future<List<JobCategory>> _futureCategories;
   bool _isCreatingDraft = false;
   bool isLoading = false;
@@ -47,7 +46,7 @@ class _CreateJobSubmissionPageState
 
   @override
   Widget build(BuildContext context) {
-    final draftCount = ref.watch(draftListProvider).length;
+    final draftCount = ref.watch(overtimeDraftListProvider).length;
     return Scaffold(
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
@@ -75,7 +74,7 @@ class _CreateJobSubmissionPageState
                 ),
               )
             : const Text(
-                'Buat Draft Pekerjaan',
+                'Buat Draft Lembur',
                 style: TextStyle(color: Colors.white),
               ),
 
@@ -95,9 +94,9 @@ class _CreateJobSubmissionPageState
               : BadgedIcon(
                   count: draftCount,
                   onPressed: () {
-                    context.pushNamed('job-submission-draft');
+                    context.pushNamed('overtime-draft');
                   },
-                  icon: HeroIcons.clipboardDocumentList,
+                  icon: HeroIcons.clock,
                 ),
         ],
       ),
@@ -173,14 +172,11 @@ class _CreateJobSubmissionPageState
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.green[100],
-                    child: HeroIcon(
-                      HeroIcons.clipboardDocumentList,
-                      color: Colors.green[800],
-                    ),
+                    child: HeroIcon(HeroIcons.clock, color: Colors.green[800]),
                   ),
                   title: Text(category.name),
                   subtitle: Text(category.description ?? 'Tidak ada deskripsi'),
-                  trailing: const HeroIcon(HeroIcons.documentPlus),
+                  trailing: const HeroIcon(HeroIcons.plusCircle),
 
                   onTap: () async {
                     if (_isCreatingDraft) return;
@@ -190,10 +186,28 @@ class _CreateJobSubmissionPageState
                     try {
                       // 🔥 SATU-SATUNYA CARA BUAT DRAFT
                       await ref
-                          .read(draftListProvider.notifier)
-                          .createDraft(category);
+                          .read(overtimeDraftListProvider.notifier)
+                          .createDraft(category: category);
 
                       if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          content: Text(
+                            'Draft "${category.name}" berhasil dibuat',
+                          ),
+                          backgroundColor: Colors.green.shade600,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
                     } catch (e) {
                       if (!mounted) return;
 

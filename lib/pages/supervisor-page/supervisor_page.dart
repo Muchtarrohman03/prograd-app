@@ -23,6 +23,17 @@ class _SupervisorPageState extends State<SupervisorPage> {
         backgroundColor: Colors.green.shade50,
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed, // ⬅ PENTING
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        selectedLabelStyle: const TextStyle(
+          fontSize: 11, // ⬅ kecilkan di sini
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w400,
+        ),
         items: [
           BottomNavigationBarItem(
             icon: HeroIcon(HeroIcons.home, style: HeroIconStyle.outline),
@@ -39,6 +50,11 @@ class _SupervisorPageState extends State<SupervisorPage> {
               style: HeroIconStyle.solid,
             ),
             label: "Persetujuan",
+          ),
+          BottomNavigationBarItem(
+            icon: HeroIcon(HeroIcons.clock, style: HeroIconStyle.outline),
+            activeIcon: HeroIcon(HeroIcons.clock, style: HeroIconStyle.solid),
+            label: "Riwayat",
           ),
           BottomNavigationBarItem(
             icon: HeroIcon(HeroIcons.userCircle, style: HeroIconStyle.outline),

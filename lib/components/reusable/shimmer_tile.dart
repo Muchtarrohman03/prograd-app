@@ -1,47 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:laravel_flutter/components/reusable/shimmer_text.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerTile extends StatelessWidget {
-  const ShimmerTile({super.key});
+  final Color? baseColor;
+  final Color? highlightColor;
+  final bool? showSubtitle;
+  const ShimmerTile({
+    super.key,
+    this.baseColor = Colors.grey,
+    this.highlightColor = Colors.white,
+    this.showSubtitle = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              // leading circle
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListTile(
+        leading: Shimmer.fromColors(
+          baseColor: baseColor!,
+          highlightColor: highlightColor!,
+          child: CircleAvatar(
+            radius: 24,
+            child: Icon(Icons.image, color: Colors.white, size: 24),
+          ),
+        ),
+        title: Shimmer.fromColors(
+          baseColor: baseColor!,
+          highlightColor: highlightColor!,
+          child: ShimmerText(width: 150, height: 18),
+        ),
+        subtitle: showSubtitle!
+            ? Shimmer.fromColors(
+                baseColor: baseColor!,
+                highlightColor: highlightColor!,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: ShimmerText(width: 100, height: 14),
                 ),
-              ),
-              const SizedBox(width: 12),
-
-              // title + subtitle
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 14,
-                      width: double.infinity,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 8),
-                    Container(height: 12, width: 150, color: Colors.white),
-                  ],
-                ),
-              ),
-            ],
+              )
+            : null,
+        trailing: Shimmer.fromColors(
+          baseColor: baseColor!,
+          highlightColor: highlightColor!,
+          child: CircleAvatar(
+            radius: 14,
+            child: ShimmerText(width: 10, height: 10),
           ),
         ),
       ),

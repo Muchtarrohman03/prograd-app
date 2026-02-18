@@ -46,7 +46,11 @@ class WeatherService {
       );
       return response.data;
     } on DioException catch (e) {
-      throw Exception('Gagal mengambil cuaca lokasi');
+      if (e.response != null) {
+        throw Exception(e.response?.data['message'] ?? 'Terjadi kesalahan');
+      } else {
+        throw Exception('Gagal terhubung ke server');
+      }
     }
   }
 }

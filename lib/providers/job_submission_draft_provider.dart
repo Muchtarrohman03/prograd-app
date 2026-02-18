@@ -53,4 +53,9 @@ class DraftNotifier extends StateNotifier<List<JobSubmissionDraft>> {
     await _repo.deleteDraft(id);
     state = state.where((d) => d.id != id).toList();
   }
+
+  Future<void> clearDrafts() async {
+    await _repo.clearAllDrafts();
+    state = [];
+  }
 }

@@ -3,14 +3,14 @@ import 'package:laravel_flutter/components/part/absence/absences_history.dart';
 import 'package:laravel_flutter/components/part/job_submission/job_submission_history.dart';
 import 'package:laravel_flutter/components/part/overtime/overtime_history.dart';
 
-class StaffHistoryPage extends StatefulWidget {
-  const StaffHistoryPage({super.key});
+class SupervisorHistoryPage extends StatefulWidget {
+  const SupervisorHistoryPage({super.key});
 
   @override
-  State<StaffHistoryPage> createState() => _StaffHistoryPageState();
+  State<SupervisorHistoryPage> createState() => _SupervisorHistoryPageState();
 }
 
-class _StaffHistoryPageState extends State<StaffHistoryPage>
+class _SupervisorHistoryPageState extends State<SupervisorHistoryPage>
     with TickerProviderStateMixin {
   late final TabController _tabController;
 

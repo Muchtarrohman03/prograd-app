@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:laravel_flutter/components/reusable/shimmer_text.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -8,12 +9,27 @@ class ProfileHeader extends StatelessWidget {
   final String? imagePath;
   final bool isLoading;
 
+  final int? jobSubmissionCount;
+  final int? absenceCount;
+  final int? overtimeCount;
+
+  // 🔥 CALLBACKS
+  final VoidCallback? onJobSubmissionTap;
+  final VoidCallback? onAbsenceTap;
+  final VoidCallback? onOvertimeTap;
+
   const ProfileHeader({
     super.key,
     required this.imagePath,
     this.username,
     this.email,
     this.isLoading = false,
+    this.jobSubmissionCount,
+    this.absenceCount,
+    this.overtimeCount,
+    this.onJobSubmissionTap,
+    this.onAbsenceTap,
+    this.onOvertimeTap,
   });
 
   @override
@@ -57,26 +73,84 @@ class ProfileHeader extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          // USERNAME
-          isLoading
-              ? const ShimmerText(width: 120, height: 18)
-              : Text(
-                  username!.toUpperCase(),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-
-          const SizedBox(height: 6),
-
-          // EMAIL
-          isLoading
-              ? const ShimmerText(width: 180)
-              : Text(email!, style: const TextStyle(color: Colors.white)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                isLoading
+                    ? _buildShimmerStatItem()
+                    : _buildStatItem(
+                        'Laporan\nKerja',
+                        jobSubmissionCount ?? 0,
+                        onTap: onJobSubmissionTap,
+                      ),
+                isLoading
+                    ? _buildShimmerStatItem()
+                    : _buildStatItem(
+                        'Laporan\nIzin',
+                        absenceCount ?? 0,
+                        onTap: onAbsenceTap,
+                      ),
+                isLoading
+                    ? _buildShimmerStatItem()
+                    : _buildStatItem(
+                        'Pengajuan\nLembur',
+                        overtimeCount ?? 0,
+                        onTap: onOvertimeTap,
+                      ),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatItem(String label, int count, {VoidCallback? onTap}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                count.toString(),
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const HeroIcon(
+                HeroIcons.chevronDown,
+                size: 16,
+                color: Colors.white,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 11, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShimmerStatItem() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        ShimmerText(width: 40, height: 30),
+        const SizedBox(height: 10),
+        ShimmerText(width: 60, height: 11),
+      ],
     );
   }
 }

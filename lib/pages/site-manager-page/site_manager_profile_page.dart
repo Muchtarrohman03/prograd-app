@@ -151,6 +151,9 @@ class _SiteManagerProfilePageState extends State<SiteManagerProfilePage> {
                     email: email,
                     imagePath: avatarPath,
                     isLoading: isLoading,
+                    jobSubmissionCount: data?["job_submission_count"],
+                    absenceCount: data?["absence_count"],
+                    overtimeCount: data?["overtime_count"],
                   ),
                   // INFO SECTION
                   const SizedBox(height: 16),

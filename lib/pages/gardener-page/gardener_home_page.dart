@@ -166,9 +166,7 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
                                 label: "Laporan\nKerja",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push(
-                                    '/gardener/create-job-submission',
-                                  );
+                                  context.push('/create-job-submission');
                                 },
                               ),
                               IconLabelButton(
@@ -178,7 +176,7 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
                                 label: "Pengajuan\nLembur",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/gardener/create-overtime');
+                                  context.push('/create-overtime');
                                 },
                               ),
                               IconLabelButton(
@@ -188,7 +186,7 @@ class _GardenerHomePageState extends State<GardenerHomePage> {
                                 label: "Laporan\nIzin",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/gardener/create-absence');
+                                  context.push('/create-absence');
                                 },
                               ),
                             ],

@@ -160,13 +160,13 @@ class _StaffHomePageState extends State<StaffHomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               IconLabelButton(
-                                icon: HeroIcons.clipboardDocumentCheck,
+                                icon: HeroIcons.clipboardDocumentList,
                                 containercolor: Colors.blue.shade100,
                                 iconcolor: Colors.blue.shade300,
                                 label: "Pekerjaan\nBaru",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/staff/job-submission');
+                                  context.push('/job-submission');
                                 },
                               ),
                               IconLabelButton(
@@ -176,7 +176,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                                 label: "Pengajuan\nLembur",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/staff/create-overtime');
+                                  context.push('/create-overtime');
                                 },
                               ),
                               IconLabelButton(
@@ -186,7 +186,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                                 label: "Laporan\nIzin",
                                 onPressed: () {
                                   // Aksi ketika tombol ditekan
-                                  context.push('/staff/create-absence');
+                                  context.push('/create-absence');
                                 },
                               ),
                             ],

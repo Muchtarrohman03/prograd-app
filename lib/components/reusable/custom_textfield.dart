@@ -4,11 +4,13 @@ class CustomTextfield extends StatelessWidget {
   final TextEditingController controller;
   final String? labeltext;
   final String? hintText;
+  final Color? borderColor;
   const CustomTextfield({
     super.key,
     required this.controller,
     this.labeltext,
     this.hintText,
+    this.borderColor,
   });
 
   @override
@@ -27,9 +29,12 @@ class CustomTextfield extends StatelessWidget {
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-          borderSide: BorderSide(color: Colors.green, width: 2),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+          borderSide: BorderSide(
+            color: borderColor ?? Colors.transparent,
+            width: 2,
+          ),
         ),
       ),
     );
